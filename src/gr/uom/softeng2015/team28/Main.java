@@ -1,3 +1,4 @@
+package gr.uom.softeng2015.team28;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
