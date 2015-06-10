@@ -39,7 +39,7 @@ public class Main {
         try
         {
             Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/Texnologia-Database","root","lk123456789");
+            con = DriverManager.getConnection("jdbc:mysql://cobalt.mastermind33.eu:3306/SoftTech2015","team28","T28Pass");
             System.out.println("Remote DB connection established");
         }
         catch (ClassNotFoundException e)
