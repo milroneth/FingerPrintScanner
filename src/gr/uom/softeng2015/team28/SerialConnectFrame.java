@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -77,8 +78,8 @@ public class SerialConnectFrame extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
-
 	private void refreshAvailablePorts() {
+
 		portList.removeAllItems();
 		String[] portNames = SerialPortList.getPortNames();
 		System.out.println("Available COM ports:");
@@ -147,24 +148,22 @@ public class SerialConnectFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 
 			if(e.getSource() == refreshButton) {
-				refreshAvailablePorts();
+				SwingUtilities.invokeLater(new Runnable() { public void run() {
+					refreshAvailablePorts();
+				} });
 			}
 			else if(e.getSource() == connectButton) {
-				terminalText.append("Connecting to " + (String)portList.getSelectedItem() + "...\n");
-				SerialPort serialPort = new SerialPort((String)portList.getSelectedItem());
-				try {
-					serialPort.openPort();	//Open serial port
-					serialPort.setParams(SerialPort.BAUDRATE_9600, 
-							SerialPort.DATABITS_8,
-							SerialPort.STOPBITS_1,
-							SerialPort.PARITY_NONE);	//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-					Thread.sleep(1500);
-					serialPort.writeBytes("1003".getBytes());	//Write data to port
-					Thread.sleep(1500);
-					serialPort.closePort();	//Close serial port
-				} catch (SerialPortException | InterruptedException ex) {
-					System.out.println(ex);
-				}
+				selectedPort = (String)portList.getSelectedItem();
+				terminalText.append("Connecting to " + selectedPort + "...\n");
+
+				SwingUtilities.invokeLater(new Runnable() { public void run() {
+					connectToArduino();
+				} });
+			}
+			else if(e.getSource() == disconnectButton) {
+				SwingUtilities.invokeLater(new Runnable() { public void run() {
+					disconnectFromArduino();
+				} });
 			}
 
 		}
