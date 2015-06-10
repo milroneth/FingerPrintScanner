@@ -27,15 +27,14 @@ public class SerialConnectFrame extends JFrame {
 	private Thread portCloseHook;
 
 	private JPanel portPanel;
-	private JLabel portSelectPrompt;
 	private JComboBox<String> portList;
 	private JButton refreshButton;
 	private JButton connectButton;
 	private JButton disconnectButton;
 
 	private JPanel terminalPanel;
-	private JScrollPane terminalScroll;
 	private JTextArea terminalText;
+	private JLabel statusBar;
 
 	public SerialConnectFrame() {
 
@@ -43,7 +42,7 @@ public class SerialConnectFrame extends JFrame {
 		portPanel = new JPanel();
 		portPanel.setLayout(new BoxLayout(portPanel, BoxLayout.X_AXIS));
 		portPanel.add(Box.createHorizontalGlue());
-		portPanel.add(portSelectPrompt = new JLabel("Select Arduino Port:"));
+		portPanel.add(new JLabel("Select Arduino Port:"));
 		portPanel.add(Box.createHorizontalStrut(5));
 		portPanel.add(portList = new JComboBox<String>());
 		portPanel.add(Box.createHorizontalStrut(5));
@@ -57,7 +56,8 @@ public class SerialConnectFrame extends JFrame {
 		terminalPanel = new JPanel();
 		terminalPanel.setLayout(new BorderLayout());
 		terminalPanel.add(portPanel, BorderLayout.NORTH);
-		terminalPanel.add(terminalScroll = new JScrollPane(terminalText = new JTextArea()), BorderLayout.CENTER);
+		terminalPanel.add(new JScrollPane(terminalText = new JTextArea()), BorderLayout.CENTER);
+		terminalPanel.add(statusBar = new JLabel("Disconnected"), BorderLayout.SOUTH);
 		// ----------------------------------------
 
 		portList.setMaximumSize(portList.getMinimumSize());
@@ -94,11 +94,13 @@ public class SerialConnectFrame extends JFrame {
 	private void connectToArduino() {
 
 		byte sensorFound = -1;
+
 		arduinoPort = new SerialPort(selectedPort);
 
 		try {
 			arduinoPort.openPort();	//Open serial port
-			arduinoPort.setParams(SerialPort.BAUDRATE_9600, 
+			statusBar.setText("Port open");
+			arduinoPort.setParams(SerialPort.BAUDRATE_9600,
 					SerialPort.DATABITS_8,
 					SerialPort.STOPBITS_1,
 					SerialPort.PARITY_NONE);	//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
@@ -106,11 +108,14 @@ public class SerialConnectFrame extends JFrame {
 		} catch (SerialPortException serialEx) {
 			System.out.println(serialEx);
 			terminalText.append("Error opening port.\n");
+			return;
 		} catch (SerialPortTimeoutException timeoutEx) {
 			System.out.println(timeoutEx);
 			terminalText.append("Connection timeout. Is the Arduino connected to " + selectedPort + " and running properly?\n");
+			return;
 		}
 
+		statusBar.setText("Connected");
 		terminalText.append("Connected to Arduino!\n");
 		if(sensorFound == '0') {
 			terminalText.append("No fingerprint sensor found!\n");
@@ -139,6 +144,7 @@ public class SerialConnectFrame extends JFrame {
 		try {
 			arduinoPort.writeBytes("1003".getBytes());	//Test writing data to port
 			arduinoPort.closePort();
+			statusBar.setText("Disconnected");
 			terminalText.append("Disconnected.\n");
 		} catch (SerialPortException serialEx) {
 			terminalText.append("Port not opened.\n");
@@ -156,6 +162,12 @@ public class SerialConnectFrame extends JFrame {
 				} });
 			}
 			else if(e.getSource() == connectButton) {
+
+				if(arduinoPort.isOpened() && statusBar.getText() == "Connected") {
+					terminalText.append("Arduino is already connected!\n");
+					return;
+				}
+
 				selectedPort = (String)portList.getSelectedItem();
 				terminalText.append("Connecting to " + selectedPort + "...\n");
 
