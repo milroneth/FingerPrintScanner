@@ -31,7 +31,7 @@ public class Main {
 			System.out.println(e.getMessage().toString());
 		}
 
-		//AdminVerificationFrame frame = new AdminVerificationFrame(admin_list,client_list);
+		AdminVerificationFrame adminFrame = new AdminVerificationFrame(admin_list,client_list);
 		SerialConnectFrame serialFrame = new SerialConnectFrame();
 
 	}
