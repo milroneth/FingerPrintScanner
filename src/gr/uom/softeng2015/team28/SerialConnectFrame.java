@@ -24,6 +24,7 @@ public class SerialConnectFrame extends JFrame {
 
 	private String selectedPort = "NULL";
 	private SerialPort arduinoPort = new SerialPort(selectedPort);
+	private Thread portCloseHook;
 
 	private JPanel portPanel;
 	private JLabel portSelectPrompt;
@@ -121,7 +122,7 @@ public class SerialConnectFrame extends JFrame {
 			terminalText.append("Uknown error!\n");
 		}
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
+		Runtime.getRuntime().addShutdownHook(portCloseHook = new Thread() {
 			public void run() {
 				try {
 					arduinoPort.closePort();
@@ -142,6 +143,8 @@ public class SerialConnectFrame extends JFrame {
 		} catch (SerialPortException serialEx) {
 			terminalText.append("Port not opened.\n");
 		}
+		
+		Runtime.getRuntime().removeShutdownHook(portCloseHook);
 	}
 
 	class ButtonListener implements ActionListener {
