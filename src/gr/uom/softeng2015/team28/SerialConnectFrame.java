@@ -26,7 +26,7 @@ public class SerialConnectFrame extends JFrame {
 
 	private JPanel portPanel;
 	private JLabel portSelectPrompt;
-	private JComboBox<String> portList;	//portList.addActionListener(this);
+	private JComboBox<String> portList;
 	private JButton refreshButton;
 	private JButton connectButton;
 	private JButton disconnectButton;
@@ -34,8 +34,6 @@ public class SerialConnectFrame extends JFrame {
 	private JPanel terminalPanel;
 	private JScrollPane terminalScroll;
 	private JTextArea terminalText;
-	//private JList portList;
-	//private ArrayList<> ports;
 
 	public SerialConnectFrame() {
 
@@ -89,7 +87,7 @@ public class SerialConnectFrame extends JFrame {
 			System.out.println(portName);
 		}
 		portList.setSelectedIndex(portList.getItemCount() - 1);
-	}                                            
+	}
 
 	private void connectToArduino() {
 
@@ -173,3 +171,4 @@ public class SerialConnectFrame extends JFrame {
 	}
 
 }
+
