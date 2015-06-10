@@ -13,18 +13,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.text.DefaultCaret;
 
+import jssc.SerialPort;
+import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class SerialConnectFrame extends JFrame {
-	
+
 	private JPanel portPanel;
 	private JLabel portSelectPrompt;
 	private JComboBox<String> portList;	//portList.addActionListener(this);
 	private JButton refreshButton;
 	private JButton connectButton;
-	
+
 	private JPanel terminalPanel;
 	private JScrollPane terminalScroll;
 	private JTextArea terminalText;
@@ -48,10 +49,10 @@ public class SerialConnectFrame extends JFrame {
 		terminalPanel.setLayout(new BorderLayout());
 		terminalPanel.add(portPanel, BorderLayout.NORTH);
 		terminalPanel.add(terminalScroll = new JScrollPane(terminalText = new JTextArea()), BorderLayout.CENTER);
-		DefaultCaret caret = (DefaultCaret) terminalText.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		// ----------------------------------------
-		
+
+		terminalText.setEditable(false);
+
 		this.setContentPane(terminalPanel);
 
 		refreshAvailablePorts();
@@ -62,6 +63,7 @@ public class SerialConnectFrame extends JFrame {
 
 		this.setVisible(true);
 		this.setSize(400, 200);
+		this.setLocationRelativeTo(null);
 		this.setTitle("Port Selection");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -75,6 +77,7 @@ public class SerialConnectFrame extends JFrame {
 			portList.addItem(portName);
 			System.out.println(portName);
 		}
+		portList.setSelectedIndex(portList.getItemCount() - 1);
 	}                                            
 
 	class ButtonListener implements ActionListener {
@@ -84,6 +87,21 @@ public class SerialConnectFrame extends JFrame {
 				refreshAvailablePorts();
 			}
 			else if(e.getSource() == connectButton) {
+				terminalText.append("Connecting to " + (String)portList.getSelectedItem() + "...\n");
+				SerialPort serialPort = new SerialPort((String)portList.getSelectedItem());
+				try {
+					serialPort.openPort();	//Open serial port
+					serialPort.setParams(SerialPort.BAUDRATE_9600, 
+							SerialPort.DATABITS_8,
+							SerialPort.STOPBITS_1,
+							SerialPort.PARITY_NONE);	//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
+					Thread.sleep(1500);
+					serialPort.writeBytes("1003".getBytes());	//Write data to port
+					Thread.sleep(1500);
+					serialPort.closePort();	//Close serial port
+				} catch (SerialPortException | InterruptedException ex) {
+					System.out.println(ex);
+				}
 			}
 
 		}
