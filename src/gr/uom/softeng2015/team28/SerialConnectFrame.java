@@ -1,44 +1,60 @@
 package gr.uom.softeng2015.team28;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 import jssc.SerialPortList;
 
 public class SerialConnectFrame extends JFrame {
+	
+	private JPanel portPanel;
 	private JLabel portSelectPrompt;
+	private JComboBox<String> portList;	//portList.addActionListener(this);
 	private JButton refreshButton;
 	private JButton connectButton;
-	private JPanel portPanel;
-	private JComboBox portList;	//portList.addActionListener(this);
+	
+	private JPanel terminalPanel;
+	private JScrollPane terminalScroll;
+	private JTextArea terminalText;
 	//private JList portList;
-	//private JTextField field;
 	//private ArrayList<> ports;
 
 	public SerialConnectFrame() {
 
-		portSelectPrompt = new JLabel("Select Arduino Port:");
-		refreshButton = new JButton("Refresh");
-		connectButton = new JButton("Connect");
+		// ----------------------------------------
 		portPanel = new JPanel();
-		portList = new JComboBox();
-
+		portPanel.setLayout(new BoxLayout(portPanel, BoxLayout.X_AXIS));
+		portPanel.add(portSelectPrompt = new JLabel("Select Arduino Port:"));
+		portPanel.add(Box.createHorizontalStrut(5));
+		portPanel.add(portList = new JComboBox<String>());
+		portPanel.add(Box.createHorizontalStrut(5));
+		portPanel.add(refreshButton = new JButton("Refresh"));
+		portPanel.add(Box.createHorizontalStrut(5));
+		portPanel.add(connectButton = new JButton("Connect"));
 		// ----------------------------------------
-		portPanel.add(portSelectPrompt);
-		portPanel.add(portList);
-		portPanel.add(refreshButton);
-		portPanel.add(connectButton);
-
+		terminalPanel = new JPanel();
+		terminalPanel.setLayout(new BorderLayout());
+		terminalPanel.add(portPanel, BorderLayout.NORTH);
+		terminalPanel.add(terminalScroll = new JScrollPane(terminalText = new JTextArea()), BorderLayout.CENTER);
+		DefaultCaret caret = (DefaultCaret) terminalText.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		// ----------------------------------------
-		this.setContentPane(portPanel);
+		
+		this.setContentPane(terminalPanel);
 
-		SetPortNames();
+		refreshAvailablePorts();
 
 		ButtonListener listener = new ButtonListener();
 		refreshButton.addActionListener(listener);
@@ -51,18 +67,11 @@ public class SerialConnectFrame extends JFrame {
 	}
 
 
-	public void ListPorts() {
-		String[] portNames = SerialPortList.getPortNames();
-		for(int i = 0; i < portNames.length; i++) {
-			System.out.println(portNames[i]);
-		}
-	}
-
-	private void SetPortNames() {
+	private void refreshAvailablePorts() {
 		portList.removeAllItems();
 		String[] portNames = SerialPortList.getPortNames();
 		System.out.println("Available COM ports:");
-		for (String portName : portNames) {
+		for(String portName: portNames) {
 			portList.addItem(portName);
 			System.out.println(portName);
 		}
@@ -72,7 +81,7 @@ public class SerialConnectFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 
 			if(e.getSource() == refreshButton) {
-				SetPortNames();
+				refreshAvailablePorts();
 			}
 			else if(e.getSource() == connectButton) {
 			}
