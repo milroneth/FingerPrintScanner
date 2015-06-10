@@ -25,6 +25,7 @@ public class SerialConnectFrame extends JFrame {
 	private JComboBox<String> portList;	//portList.addActionListener(this);
 	private JButton refreshButton;
 	private JButton connectButton;
+	private JButton disconnectButton;
 
 	private JPanel terminalPanel;
 	private JScrollPane terminalScroll;
@@ -37,6 +38,7 @@ public class SerialConnectFrame extends JFrame {
 		// ----------------------------------------
 		portPanel = new JPanel();
 		portPanel.setLayout(new BoxLayout(portPanel, BoxLayout.X_AXIS));
+		portPanel.add(Box.createHorizontalGlue());
 		portPanel.add(portSelectPrompt = new JLabel("Select Arduino Port:"));
 		portPanel.add(Box.createHorizontalStrut(5));
 		portPanel.add(portList = new JComboBox<String>());
@@ -44,6 +46,9 @@ public class SerialConnectFrame extends JFrame {
 		portPanel.add(refreshButton = new JButton("Refresh"));
 		portPanel.add(Box.createHorizontalStrut(5));
 		portPanel.add(connectButton = new JButton("Connect"));
+		portPanel.add(Box.createHorizontalStrut(5));
+		portPanel.add(disconnectButton = new JButton("Disconnect"));
+		portPanel.add(Box.createHorizontalStrut(5));
 		// ----------------------------------------
 		terminalPanel = new JPanel();
 		terminalPanel.setLayout(new BorderLayout());
@@ -51,6 +56,7 @@ public class SerialConnectFrame extends JFrame {
 		terminalPanel.add(terminalScroll = new JScrollPane(terminalText = new JTextArea()), BorderLayout.CENTER);
 		// ----------------------------------------
 
+		portList.setMaximumSize(portList.getMinimumSize());
 		terminalText.setEditable(false);
 
 		this.setContentPane(terminalPanel);
@@ -60,9 +66,10 @@ public class SerialConnectFrame extends JFrame {
 		ButtonListener listener = new ButtonListener();
 		refreshButton.addActionListener(listener);
 		connectButton.addActionListener(listener);
+		disconnectButton.addActionListener(listener);
 
 		this.setVisible(true);
-		this.setSize(400, 200);
+		this.setSize(600, 200);
 		this.setLocationRelativeTo(null);
 		this.setTitle("Port Selection");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
